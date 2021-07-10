@@ -9,4 +9,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 link_directories(lib)
 add_executable(GLUTDemo main.cpp)
 
-target_link_libraries(GLUTDemo freeglut opengl32 glu32)
+
+message("")
