@@ -2,8 +2,6 @@
 │  ├─bin
 │  ├─CMakeFiles
 │  │  ├─3.17.5
-│  └─Testing
-│      └─Temporary
 ├─include
 │  └─GL
 └─lib
