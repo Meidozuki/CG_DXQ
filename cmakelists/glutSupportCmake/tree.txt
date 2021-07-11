@@ -1,0 +1,10 @@
+├─cmake-build-debug
+│  ├─bin
+│  ├─CMakeFiles
+│  │  ├─3.17.5
+├─include
+│  └─GL
+└─lib
+    ├─cmake
+    │  └─FreeGLUT
+    └─pkgconfig
