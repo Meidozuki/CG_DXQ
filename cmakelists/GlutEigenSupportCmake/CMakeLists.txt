@@ -1,13 +1,24 @@
 cmake_minimum_required(VERSION 3.17)
-project(GLUTDemo)
+project(Rasterizer)
 
 set(CMAKE_CXX_STANDARD 14)
 
+#include_directories(install/include)
+#link_directories(install/lib)
+
 include_directories(include)
-include_directories(include/eigen3)
-link_directories(lib)
+
+find_package(FreeGLUT REQUIRED
+        PATHS 3rd/opengl/lib/cmake)
+
+#find_package(Eigen3 REQUIRED
+#        PATHS 3rd/eigen/share)
+include_directories(3rd/eigen/include/eigen3)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
-add_executable(GLUTDemo main.cpp)
+add_executable(Rasterizer main.cpp)
 
-target_link_libraries(GLUTDemo freeglut openGL32 glu32)
+target_link_libraries(Rasterizer
+        FreeGLUT::freeglut
+        opengl32
+        glu32)
