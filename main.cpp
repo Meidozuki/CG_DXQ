@@ -299,7 +299,7 @@ Eigen::Vector3f bump_fragment_shader(const fragment_shader_payload& payload)
 
     return result_color * 255.f;
 }
-
+/*
 template<typename T>
 std::vector<T> Vector_Divide(std::vector<T>&v, int size)
 {
@@ -316,7 +316,7 @@ std::vector<T> Vector_Divide(std::vector<T>&v, int size)
         }
     }
 
-}
+}*/
 
 int main(int argc, const char** argv)
 {
