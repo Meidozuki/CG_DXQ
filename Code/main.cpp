@@ -1,12 +1,15 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <opencv2/opencv.hpp>
-
+#include "pro_function.hpp"
 #include "global.hpp"
 #include "rasterizer.hpp"
 #include "Triangle.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
 #include "OBJ_Loader.h"
+#include "ThreadPool.hpp"
+
+#define Pool_size 16
 
 Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
 {
@@ -107,20 +110,20 @@ struct light
     Eigen::Vector3f intensity;
 };
 
-// ÎÆÀíshader
+// çº¹ç†shader
 Eigen::Vector3f texture_fragment_shader(const fragment_shader_payload& payload)
 {
     Eigen::Vector3f return_color = { 0, 0, 0 };
     if (payload.texture)
     {
-        // »ñÈ¡ÎÆÀí×ø±êµÄÑÕÉ«
+        // è·å–çº¹ç†åæ ‡çš„é¢œè‰²
         return_color = payload.texture->getColor(payload.tex_coords.x(), payload.tex_coords.y());
     }
     Eigen::Vector3f texture_color;
     texture_color << return_color.x(), return_color.y(), return_color.z();
 
     Eigen::Vector3f ka = Eigen::Vector3f(0.005, 0.005, 0.005);
-    Eigen::Vector3f kd = texture_color / 255.f;  // ÑÕÉ«¹éÒ»»¯
+    Eigen::Vector3f kd = texture_color / 255.f;  // é¢œè‰²å½’ä¸€åŒ–
     Eigen::Vector3f ks = Eigen::Vector3f(0.7937, 0.7937, 0.7937);
 
     auto l1 = light{ {20, 20, 20}, {500, 500, 500} };
@@ -168,7 +171,7 @@ Eigen::Vector3f phong_fragment_shader(const fragment_shader_payload& payload)
     Eigen::Vector3f kd = payload.color;
     Eigen::Vector3f ks = Eigen::Vector3f(0.7937, 0.7937, 0.7937);
 
-    auto l1 = light{ {20, 20, 20}, {500, 500, 500} };  // µÆ¹âÎ»ÖÃ ºÍ Ç¿¶È
+    auto l1 = light{ {20, 20, 20}, {500, 500, 500} };  // ç¯å…‰ä½ç½® å’Œ å¼ºåº¦
     auto l2 = light{ {-20, 20, 0}, {500, 500, 500} };
 
     std::vector<light> lights = { l1, l2 };
@@ -178,17 +181,17 @@ Eigen::Vector3f phong_fragment_shader(const fragment_shader_payload& payload)
     float p = 150;
 
     Eigen::Vector3f color = payload.color;
-    Eigen::Vector3f point = payload.view_pos;  // Æ¬¶ÎÎ»ÖÃ
+    Eigen::Vector3f point = payload.view_pos;  // ç‰‡æ®µä½ç½®
     Eigen::Vector3f normal = payload.normal;
 
     Eigen::Vector3f result_color = { 0, 0, 0 };
     for (auto& light : lights)
     {
-        // ¹âµÄ·½Ïò
+        // å…‰çš„æ–¹å‘
         Eigen::Vector3f light_dir = light.position - point;
-        // ÊÓÏß·½Ïò
+        // è§†çº¿æ–¹å‘
         Eigen::Vector3f view_dir = eye_pos - point;
-        // Ë¥¼õÒò×Ó
+        // è¡°å‡å› å­
         float r = light_dir.dot(light_dir);
 
         // ambient
@@ -298,10 +301,11 @@ Eigen::Vector3f bump_fragment_shader(const fragment_shader_payload& payload)
     return result_color * 255.f;
 }
 
+
 int main(int argc, const char** argv)
 {
     std::vector<Triangle*> TriangleList;
-
+	Thread::ThreadPool *pools = new Thread::ThreadPool(Pool_size);   //çº¿ç¨‹æ± 
     float angle = 140.0;
     bool command_line = false;
 
@@ -326,14 +330,14 @@ int main(int argc, const char** argv)
         }
     }
 
-    rst::rasterizer r(700, 700);
+    rst::rasterizer *r = new rst::rasterizer(700, 700);
 
-    auto texture_path = "hmap.jpg";
-    r.set_texture(Texture(obj_path + texture_path));
+    auto texture_path = "spot_texture.png";
+    r->set_texture(Texture(obj_path + texture_path));
 
     std::function<Eigen::Vector3f(fragment_shader_payload)> active_shader = phong_fragment_shader;
 
-    if (argc >= 2)
+    /*if (argc >= 2)
     {
         command_line = true;
         filename = std::string(argv[1]);
@@ -365,25 +369,28 @@ int main(int argc, const char** argv)
             std::cout << "Rasterizing using the bump shader\n";
             active_shader = displacement_fragment_shader;
         }
-    }
+    }*/
 
     Eigen::Vector3f eye_pos = { 0,0,10 };
 
-    r.set_vertex_shader(vertex_shader);
-    r.set_fragment_shader(active_shader);
+    r->set_vertex_shader(vertex_shader);
+    r->set_fragment_shader(active_shader);
 
     int key = 0;
     int frame_count = 0;
 
     if (command_line)
     {
-        r.clear(rst::Buffers::Color | rst::Buffers::Depth);
-        r.set_model(get_model_matrix(angle));
-        r.set_view(get_view_matrix(eye_pos));
-        r.set_projection(get_projection_matrix(45.0, 1, 0.1, 50));
-
-        r.draw(TriangleList);
-        cv::Mat image(700, 700, CV_32FC3, r.frame_buffer().data());
+        r->clear(rst::Buffers::Color | rst::Buffers::Depth);
+        r->set_model(get_model_matrix(angle));
+        r->set_view(get_view_matrix(eye_pos));
+        r->set_projection(get_projection_matrix(45.0, 1, 0.1, 50));
+		std::vector<std::vector<Triangle*>> divide_lists;
+		std::vector<Triangle*> divide;
+		divide_lists=pro_function::Vector_Divide(TriangleList,Pool_size); //æ‹†åˆ†
+		pro_function::allocate_ThreadPool(Pool_size, divide_lists, pools, r);
+		delete pools;
+        cv::Mat image(700, 700, CV_32FC3, r->frame_buffer().data());
         image.convertTo(image, CV_8UC3, 1.0f);
         cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
 
@@ -391,7 +398,29 @@ int main(int argc, const char** argv)
 
         return 0;
     }
+	clock_t start = clock();
+	r->clear(rst::Buffers::Color | rst::Buffers::Depth);
 
+	r->set_model(get_model_matrix(angle));
+	r->set_view(get_view_matrix(eye_pos));
+	r->set_projection(get_projection_matrix(45.0, 1, 0.1, 50));
+	//r->draw(TriangleList);
+	std::vector<std::vector<Triangle*> > divide_lists;
+	std::vector<Triangle*> divide;
+	divide_lists = pro_function::Vector_Divide(TriangleList, Pool_size);
+	pro_function::allocate_ThreadPool(Pool_size, divide_lists, pools, r);
+	delete pools;
+	cv::Mat image(700, 700, CV_32FC3, r->frame_buffer().data());
+	image.convertTo(image, CV_8UC3, 1.0f);
+	cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
+
+	cv::imshow("image", image);
+	cv::imwrite(filename, image);
+	key = cv::waitKey(10);
+	clock_t end = clock();
+	std::cout << "run time is:" << (double)(end - start) / CLOCKS_PER_SEC << endl;
+	system("pause");
+	/*
     while (key != 27)
     {
         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
@@ -401,7 +430,15 @@ int main(int argc, const char** argv)
         r.set_projection(get_projection_matrix(45.0, 1, 0.1, 50));
 
         //r.draw(pos_id, ind_id, col_id, rst::Primitive::Triangle);
-        r.draw(TriangleList);
+		std::vector<std::vector<Triangle*>> divide_lists;
+		std::vector<Triangle*> divide;
+		divide_lists = pro_function::Vector_Divide(TriangleList, Pool_size); //æ‹†åˆ†
+		pools->enqueue(pro_function::draw, r, divide_lists[0]);
+		//r.draw(divide_lists[1]);
+		//r.draw(divide_lists[2]);
+		//r.draw(divide_lists[3]);
+		//pro_function::allocate_ThreadPool(Pool_size, divide_lists, pools, r);
+		delete pools;
         cv::Mat image(700, 700, CV_32FC3, r.frame_buffer().data());
         image.convertTo(image, CV_8UC3, 1.0f);
         cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
@@ -418,7 +455,8 @@ int main(int argc, const char** argv)
         {
             angle += 0.1;
         }
-
-    }
+        frame_count++;
+        std::cout << frame_count << std::endl;
+    }*/
     return 0;
 }
