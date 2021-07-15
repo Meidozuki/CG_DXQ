@@ -18,7 +18,7 @@ include_directories(3rd/eigen/include/eigen3)
 #conveniece to link shared libs
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 add_executable(Rasterizer
-        main.cpp  rasterizer.cpp Triangle.cpp viewmodel.cpp
+        main.cpp  rasterizer.cpp Triangle.cpp viewmodel.cpp Message.cpp
         )
 
 target_link_libraries(Rasterizer

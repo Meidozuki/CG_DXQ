@@ -1,18 +1,18 @@
-#pragma once
 #include <iostream>
 #include <cstdint>
 #include <memory>
 
 #include <opencv2/opencv.hpp>
-#include "viewmodel.hpp"
-extern ViewModel vm;
+#include "Message.h"
 
 using namespace std;
 
-shared_ptr<cv::Mat> glop;
+void waitKey();
+extern Message msg_ctrl;
+
 
 using cv::Point;
-Point pt1,pt2;
+static Point pt1,pt2;
 void mouseCallback(int mouseEvent,int x,int y,int flags,void* param)
 {
     static bool is_selecting=false;
@@ -37,23 +37,24 @@ void mouseCallback(int mouseEvent,int x,int y,int flags,void* param)
 }
 
 
-
-
-void processNormalKeys(unsigned char key,int x,int y) {
+void waitKey() {
+    int key=cv::waitKey(10);
+    if (key == -1) return;
     if (key == 27) exit(0);
-    vm.processViewMessage(string(1,key));
-}
 
-
-void read_bmp() {
-    std::string filename("D:/model.bmp");
-    cv::Mat img=cv::imread(filename);
-
-    if (img.empty()) {
-        throw std::runtime_error("file not opened");
+    cout << "received " << static_cast<char>(key) << endl;
+    string msg;
+    switch (key) {
+        case 'a':
+            msg="angleMinus";break;
+        case 'd':
+            msg="anglePlus";break;
+        case 'r':
+            msg="redraw";break;
+        default:
+            msg="skip";break;
     }
-
-    shared_ptr<cv::Mat> sp(new cv::Mat(img));
-    glop=sp;
-    std::cout << "ptr_cnt in read_fn: " << sp.use_count() << std::endl;
+    if (msg != "skip"){
+        msg_ctrl.callFunc(msg);
+    }
 }

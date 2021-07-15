@@ -175,14 +175,23 @@ void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
     float f2 = (50 + 0.1) / 2.0;
 
     Eigen::Matrix4f mvp = projection * view * model;
+
+    //add
+    Eigen::Matrix4f mv=view*model;
+
     for (const auto& t:TriangleList)
     {
         Triangle newtri = *t;
 
+//        std::array<Eigen::Vector4f, 3> mm {
+//                (view * model * t->v[0]),
+//                (view * model * t->v[1]),
+//                (view * model * t->v[2])
+//        };
         std::array<Eigen::Vector4f, 3> mm {
-                (view * model * t->v[0]),
-                (view * model * t->v[1]),
-                (view * model * t->v[2])
+                (mv * t->v[0]),
+                (mv * t->v[1]),
+                (mv * t->v[2])
         };
 
         std::array<Eigen::Vector3f, 3> viewspace_pos;
@@ -197,13 +206,20 @@ void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
                 mvp * t->v[2]
         };
         //Homogeneous division
-        for (auto& vec : v) {
-            vec.x()/=vec.w();
-            vec.y()/=vec.w();
-            vec.z()/=vec.w();
+//        for (auto& vec : v) {
+        for (int i=0;i < 3;++i) {
+            auto &vec=v[i];
+//            vec.x()/=vec.w();
+//            vec.y()/=vec.w();
+//            vec.z()/=vec.w();
+            float &&div=1/vec.w();
+            vec.x()*=div;
+            vec.y()*=div;
+            vec.z()*=div;
         }
 
-        Eigen::Matrix4f inv_trans = (view * model).inverse().transpose();
+        Eigen::Matrix4f inv_trans = (mv).inverse().transpose();
+//        Eigen::Matrix4f inv_trans = (view*model).inverse().transpose();
         Eigen::Vector4f n[] = {
                 inv_trans * to_vec4(t->normal[0], 0.0f),
                 inv_trans * to_vec4(t->normal[1], 0.0f),
@@ -211,8 +227,11 @@ void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
         };
 
         //Viewport transformation
-        for (auto & vert : v)
+//        for (auto & vert : v)
+        for (int i=0;i < 3;++i)
         {
+            //add
+            auto &vert=v[i];
             vert.x() = 0.5*width*(vert.x()+1.0);
             vert.y() = 0.5*height*(vert.y()+1.0);
             vert.z() = vert.z() * f1 + f2;
