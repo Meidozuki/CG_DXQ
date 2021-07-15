@@ -2,7 +2,9 @@
 #include <opencv2/opencv.hpp>
 
 #include "main_func.cpp"
-#include "viewmodel.cpp"
+
+#include "config.h"
+#include "viewmodel.hpp"
 extern ViewModel vm;
 
 int main(int argc, const char** argv)
@@ -14,10 +16,11 @@ int main(int argc, const char** argv)
 
     std::string filename = "output.png";
     objl::Loader Loader;
-    std::string obj_path = "D:/coding/dxq/models/spot/";
+    std::string cur_path(CUR_SRC_DIR);
+    std::string obj_path = cur_path + "/models/spot/";
 
     // Load .obj File
-    bool loadout = Loader.LoadFile("D:/coding/dxq/models/spot/spot_triangulated_good.obj");
+    bool loadout = Loader.LoadFile(cur_path + "/models/spot/spot_triangulated_good.obj");
     for (auto mesh : Loader.LoadedMeshes)
     {
         for (int i = 0; i < mesh.Vertices.size(); i += 3)
