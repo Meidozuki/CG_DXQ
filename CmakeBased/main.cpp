@@ -102,31 +102,8 @@ int main(int argc, const char** argv)
 //        return 0;
 //    }
 
-    std::cout << "success built\n";
-
     vm=ViewModel(r,eye_pos,TriangleList,filename,angle,45.0, 1, 0.1, 50);
-    vm.viewInit(argc,argv);
+    vm.viewInit();
 
-    while (key != 27)
-    {
-
-        r.clear(rst::Buffers::Color | rst::Buffers::Depth);
-
-        r.set_model(get_model_matrix(angle));
-        r.set_view(get_view_matrix(eye_pos));
-        r.set_projection(get_projection_matrix(45.0, 1, 0.1, 50));
-
-        printf("%s\n",typeid(r.frame_buffer().data()).name());
-
-//        r.draw(pos_id, ind_id, col_id, rst::Primitive::Triangle);
-        r.draw(TriangleList);
-        cv::Mat image(700, 700, CV_32FC3, r.frame_buffer().data());
-        image.convertTo(image, CV_8UC3, 1.0f);
-        cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
-
-        cv::imshow("image", image);
-        cv::imwrite(filename, image);
-        key = cv::waitKey(10);
-    }
     return 0;
 }

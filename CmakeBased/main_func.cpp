@@ -1,7 +1,4 @@
-﻿//
-// Created by user on 2021/7/12.
-//
-
+﻿
 #include "global.hpp"
 #include "rasterizer.hpp"
 #include "Triangle.hpp"
