@@ -1,5 +1,6 @@
 ﻿
 #include "viewmodel.hpp"
+#include <ctime>
 
 ViewModel vm;
 extern Message msg_ctrl;
@@ -18,7 +19,7 @@ void ViewModel::showImage(bool write=false) {
 void ViewModel::viewInit() {
     redraw();
     showImage();
-    msg_ctrl.toView();
+    msg_ctrl.announceView();
 
     msg_ctrl.registerFunc("anglePlus",
                           [this](){this->modifyAngle(1);}
@@ -29,16 +30,12 @@ void ViewModel::viewInit() {
     msg_ctrl.registerFunc("redraw",
                           [this](){this->redraw();}
     );
+    msg_ctrl.registerFunc("imshow",
+                          [this](){this->showImage();}
+    );
 
-    viewLoop();
+    msg_ctrl.mainLoop();
 };
-
-void ViewModel::viewLoop() {
-    while (true) {
-        msg_ctrl.callFunc("waitKey");
-        showImage();
-    }
-}
 
 
 
@@ -55,27 +52,8 @@ void ViewModel::redraw() {
     r->set_model(get_model_matrix(angle));
     r->set_view(get_view_matrix(eye_pos));
     r->set_projection(get_projection_matrix(eye_fov,aspect_ratio,zNear,zFar));
+    auto start_t=clock();
     r->draw(*TriangleList);
+    cout << '\r' << clock()-start_t << " ms" << ends;
     cout << "render completed" << endl;
-}
-
-void ViewModel::processViewMessage(int key) {
-    cout << "received " << key << endl;
-    switch (key) {
-        case 'a':
-            angle-=1;
-            break;
-        case 'd':
-            angle+=1;
-            break;
-        default:
-            break;
-    }
-
-    cout << angle << endl;
-}
-
-
-int&& receiveMessage(int &&key) {
-    return forward<int>(key);
 }

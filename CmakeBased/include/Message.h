@@ -19,7 +19,8 @@ public:
 
     void registerFunc(const string &s,ftype f);
     void callFunc(const string &s); //TODO:是否需要参数，int还是void?
-    void toView();
+    void announceView();
+    void mainLoop();
 };
 
 
