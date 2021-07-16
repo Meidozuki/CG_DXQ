@@ -290,15 +290,21 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
     auto v = t.toVector4();
 
     // bounding box
-    const float &min_x = std::min(v[0][0], std::min(v[1][0], v[2][0]));
-    const float &max_x = std::max(v[0][0], std::max(v[1][0], v[2][0]));
-    const float &min_y = std::min(v[0][1], std::min(v[1][1], v[2][1]));
-    const float &max_y = std::max(v[0][1], std::max(v[1][1], v[2][1]));
+//    const float &min_x = std::min(v[0][0], std::min(v[1][0], v[2][0]));
+//    const float &max_x = std::max(v[0][0], std::max(v[1][0], v[2][0]));
+//    const float &min_y = std::min(v[0][1], std::min(v[1][1], v[2][1]));
+//    const float &max_y = std::max(v[0][1], std::max(v[1][1], v[2][1]));
+    const float ax=v[0][0],bx=v[1][0],cx=v[2][0];
+    const float &min_x = std::min(ax, std::min(bx, cx));
+    const float &max_x = std::max(ax, std::max(bx, cx));
+    const float ay=v[0][1],by=v[1][1],cy=v[2][1];
+    const float &min_y = std::min(ay, std::min(by, cy));
+    const float &max_y = std::max(ay, std::max(by, cy));
 
-    int &&x_min = std::floor(min_x);
-    int &&x_max = std::ceil(max_x);
-    int &&y_min = std::floor(min_y);
-    int &&y_max = std::ceil(max_y);
+    int x_min = std::floor(min_x);
+    int x_max = std::ceil(max_x);
+    int y_min = std::floor(min_y);
+    int y_max = std::ceil(max_y);
 
     for (int i = x_min; i <= x_max; i++)
     {
@@ -309,8 +315,8 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
                 //Depth interpolated
                 auto [alpha, beta, gamma] = computeBarycentric2D(i + 0.5, j + 0.5, t.v);
 
-                float &&Z = 1.0 / (alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
                 float zp = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
+                float Z = 1.0f / (alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
                 zp *= Z;
 
                 if (zp < depth_buf[get_index(i, j)])
