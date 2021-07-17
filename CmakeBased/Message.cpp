@@ -12,8 +12,15 @@ void viewReg(){
     cv::setMouseCallback("image",mouseCallback);
 }
 
-void Message::toView() {
+void Message::announceView() {
     viewReg();
+}
+
+void Message::mainLoop() {
+    while (true) {
+        callFunc("waitKey");
+        callFunc("imshow");
+    }
 }
 
 void Message::registerFunc(const string &s,ftype f) {

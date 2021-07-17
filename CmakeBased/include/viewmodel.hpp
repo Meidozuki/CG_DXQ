@@ -46,12 +46,6 @@ public:
     ~ViewModel() {refs.clear();}
 
     void viewInit();
-    void viewLoop();
-    int&& receiveMessage(int &&);
-
-
-    void processViewMessage(int Key);
-
 
 
     void redraw();

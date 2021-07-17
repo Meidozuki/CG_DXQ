@@ -169,25 +169,19 @@ static std::tuple<float, float, float> computeBarycentric2D(float x, float y, co
     return {c1,c2,c3};
 }
 
+
 void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
 
     float f1 = (50 - 0.1) / 2.0;
     float f2 = (50 + 0.1) / 2.0;
 
     Eigen::Matrix4f mvp = projection * view * model;
-
-    //add
     Eigen::Matrix4f mv=view*model;
 
     for (const auto& t:TriangleList)
     {
         Triangle newtri = *t;
 
-//        std::array<Eigen::Vector4f, 3> mm {
-//                (view * model * t->v[0]),
-//                (view * model * t->v[1]),
-//                (view * model * t->v[2])
-//        };
         std::array<Eigen::Vector4f, 3> mm {
                 (mv * t->v[0]),
                 (mv * t->v[1]),
@@ -206,12 +200,9 @@ void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
                 mvp * t->v[2]
         };
         //Homogeneous division
-//        for (auto& vec : v) {
+
         for (int i=0;i < 3;++i) {
             auto &vec=v[i];
-//            vec.x()/=vec.w();
-//            vec.y()/=vec.w();
-//            vec.z()/=vec.w();
             float &&div=1/vec.w();
             vec.x()*=div;
             vec.y()*=div;
@@ -219,7 +210,6 @@ void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
         }
 
         Eigen::Matrix4f inv_trans = (mv).inverse().transpose();
-//        Eigen::Matrix4f inv_trans = (view*model).inverse().transpose();
         Eigen::Vector4f n[] = {
                 inv_trans * to_vec4(t->normal[0], 0.0f),
                 inv_trans * to_vec4(t->normal[1], 0.0f),
@@ -227,10 +217,8 @@ void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
         };
 
         //Viewport transformation
-//        for (auto & vert : v)
         for (int i=0;i < 3;++i)
         {
-            //add
             auto &vert=v[i];
             vert.x() = 0.5*width*(vert.x()+1.0);
             vert.y() = 0.5*height*(vert.y()+1.0);
@@ -249,9 +237,9 @@ void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
             newtri.setNormal(i, n[i].head<3>());
         }
 
-        newtri.setColor(0, 148,121.0,92.0);
-        newtri.setColor(1, 148,121.0,92.0);
-        newtri.setColor(2, 148,121.0,92.0);
+        newtri.setColor(0, 148.0f,121.0f,92.0f);
+        newtri.setColor(1, 148.0f,121.0f,92.0f);
+        newtri.setColor(2, 148.0f,121.0f,92.0f);
 
         // Also pass view space vertice position
         rasterize_triangle(newtri, viewspace_pos);
@@ -302,10 +290,16 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
     auto v = t.toVector4();
 
     // bounding box
-    float min_x = std::min(v[0][0], std::min(v[1][0], v[2][0]));
-    float max_x = std::max(v[0][0], std::max(v[1][0], v[2][0]));
-    float min_y = std::min(v[0][1], std::min(v[1][1], v[2][1]));
-    float max_y = std::max(v[0][1], std::max(v[1][1], v[2][1]));
+//    const float &min_x = std::min(v[0][0], std::min(v[1][0], v[2][0]));
+//    const float &max_x = std::max(v[0][0], std::max(v[1][0], v[2][0]));
+//    const float &min_y = std::min(v[0][1], std::min(v[1][1], v[2][1]));
+//    const float &max_y = std::max(v[0][1], std::max(v[1][1], v[2][1]));
+    const float ax=v[0][0],bx=v[1][0],cx=v[2][0];
+    const float &min_x = std::min(ax, std::min(bx, cx));
+    const float &max_x = std::max(ax, std::max(bx, cx));
+    const float ay=v[0][1],by=v[1][1],cy=v[2][1];
+    const float &min_y = std::min(ay, std::min(by, cy));
+    const float &max_y = std::max(ay, std::max(by, cy));
 
     int x_min = std::floor(min_x);
     int x_max = std::ceil(max_x);
@@ -321,8 +315,8 @@ void rst::rasterizer::rasterize_triangle(const Triangle& t, const std::array<Eig
                 //Depth interpolated
                 auto [alpha, beta, gamma] = computeBarycentric2D(i + 0.5, j + 0.5, t.v);
 
-                float Z = 1.0 / (alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
                 float zp = alpha * v[0].z() / v[0].w() + beta * v[1].z() / v[1].w() + gamma * v[2].z() / v[2].w();
+                float Z = 1.0f / (alpha / v[0].w() + beta / v[1].w() + gamma / v[2].w());
                 zp *= Z;
 
                 if (zp < depth_buf[get_index(i, j)])
