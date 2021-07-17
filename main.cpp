@@ -8,6 +8,10 @@
 #include "Texture.hpp"
 #include "OBJ_Loader.h"
 
+#include "config.h"
+#include "viewmodel.hpp"
+extern ViewModel vm;
+
 #define Pool_size 4
 
 Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos)
@@ -423,34 +427,38 @@ int main(int argc, const char** argv)
 
         return 0;
     }
+    
+    
+    vm=ViewModel(r,eye_pos,TriangleList,filename,angle,45.0, 1, 0.1, 50);
+    vm.viewInit();
 
-    while (key != 27)
-    {
-        r.clear(rst::Buffers::Color | rst::Buffers::Depth);
+//     while (key != 27)
+//     {
+//         r.clear(rst::Buffers::Color | rst::Buffers::Depth);
 
-        r.set_model(get_model_matrix(angle));
-        r.set_view(get_view_matrix(eye_pos));
-        r.set_projection(get_projection_matrix(45.0, 1, 0.1, 50));
+//         r.set_model(get_model_matrix(angle));
+//         r.set_view(get_view_matrix(eye_pos));
+//         r.set_projection(get_projection_matrix(45.0, 1, 0.1, 50));
 
-        //r.draw(pos_id, ind_id, col_id, rst::Primitive::Triangle);
-        r.draw(TriangleList);
-        cv::Mat image(700, 700, CV_32FC3, r.frame_buffer().data());
-        image.convertTo(image, CV_8UC3, 1.0f);
-        cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
+//         //r.draw(pos_id, ind_id, col_id, rst::Primitive::Triangle);
+//         r.draw(TriangleList);
+//         cv::Mat image(700, 700, CV_32FC3, r.frame_buffer().data());
+//         image.convertTo(image, CV_8UC3, 1.0f);
+//         cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
 
-        cv::imshow("image", image);
-        cv::imwrite(filename, image);
-        key = cv::waitKey(10);
+//         cv::imshow("image", image);
+//         cv::imwrite(filename, image);
+//         key = cv::waitKey(10);
 
-        if (key == 'a')
-        {
-            angle -= 0.1;
-        }
-        else if (key == 'd')
-        {
-            angle += 0.1;
-        }
+//         if (key == 'a')
+//         {
+//             angle -= 0.1;
+//         }
+//         else if (key == 'd')
+//         {
+//             angle += 0.1;
+//         }
 
-    }
+//     }
     return 0;
 }
