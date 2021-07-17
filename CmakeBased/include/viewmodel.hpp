@@ -50,8 +50,20 @@ public:
 
     void redraw();
     void showImage(bool);
-    inline void modifyAngle(const float &delta);
-    inline void modifyAngle(float &&delta) ;
+
+    //(default inline) func
+    void modifyAngle(const float &delta) {
+        angle+=delta;
+    }
+    void modifyAngle(float &&delta) {
+        angle+=delta;
+    }
+    void modifyEyepos(const float &delta,const int &id) {
+        eye_pos[id]+=delta;
+    }
+    void modifyEyepos(float &&delta,int &&id) {
+        eye_pos[id]+=delta;
+    }
 };
 
 #endif //MAIN_CPP_VIEWMODEL_H
