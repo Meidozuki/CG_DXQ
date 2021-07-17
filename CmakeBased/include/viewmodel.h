@@ -7,8 +7,8 @@
 
 #include <iostream>
 #include <Eigen/Core>
+#include <memory>
 #include "rasterizer.hpp"
-#include "Message.h"
 
 extern Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos);
 extern Eigen::Matrix4f get_model_matrix(float angle);
@@ -45,11 +45,11 @@ public:
     }
     ~ViewModel() {refs.clear();}
 
-    void viewInit();
 
+    cv::Mat getImage(bool write=false);
 
+    void vmInit();
     void redraw();
-    void showImage(bool);
 
     //(default inline) func
     void modifyAngle(const float &delta) {
