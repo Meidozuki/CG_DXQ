@@ -27,6 +27,24 @@ void ViewModel::viewInit() {
     msg_ctrl.registerFunc("angleMinus",
                           [this](){this->modifyAngle(-1);}
     );
+    msg_ctrl.registerFunc("eyeLeft",
+                          [this](){this->modifyEyepos(0.1,0);}
+    );
+    msg_ctrl.registerFunc("eyeRight",
+                          [this](){this->modifyEyepos(-0.1,0);}
+    );
+    msg_ctrl.registerFunc("eyeUp",
+                          [this](){this->modifyEyepos(0.1,1);}
+    );
+    msg_ctrl.registerFunc("eyeDown",
+                          [this](){this->modifyEyepos(-0.1,1);}
+    );
+    msg_ctrl.registerFunc("eyeZPlus",
+                          [this](){this->modifyEyepos(0.2,2);}
+    );
+    msg_ctrl.registerFunc("eyeZMinus",
+                          [this](){this->modifyEyepos(-0.2,2);}
+    );
     msg_ctrl.registerFunc("redraw",
                           [this](){this->redraw();}
     );
@@ -38,13 +56,6 @@ void ViewModel::viewInit() {
 };
 
 
-
-void ViewModel::modifyAngle(const float &delta) {
-    angle+=delta;
-}
-void ViewModel::modifyAngle(float &&delta) {
-    angle+=delta;
-}
 
 void ViewModel::redraw() {
     cout << "rendering" << endl;
