@@ -4,8 +4,9 @@
 #include "main_func.cpp"
 
 #include "config.h"
-#include "viewmodel.hpp"
-extern ViewModel vm;
+#include "viewmodel.h"
+#include "Message.h"
+extern Message msg_ctrl;
 
 int main(int argc, const char** argv)
 {
@@ -82,7 +83,6 @@ int main(int argc, const char** argv)
     r.set_vertex_shader(vertex_shader);
     r.set_fragment_shader(active_shader);
 
-    int key = 0;
     int frame_count = 0;
 
 //    if (command_line)
@@ -102,8 +102,11 @@ int main(int argc, const char** argv)
 //        return 0;
 //    }
 
-    vm=ViewModel(r,eye_pos,TriangleList,filename,angle,45.0, 1, 0.1, 50);
-    vm.viewInit();
+    ViewModel vm=ViewModel(r,eye_pos,TriangleList,filename,angle,45.0, 1, 0.1, 50);
+    msg_ctrl.registerFunc("prepareVM",[&vm](){vm.vmInit();});
+
+    msg_ctrl.callFunc("prepareVM");
+    msg_ctrl.callFunc("announceView");//start loop
 
     return 0;
 }

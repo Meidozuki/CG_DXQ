@@ -15,10 +15,15 @@ include_directories(3rd/opencv/include)
 #        PATHS 3rd/eigen/share)
 include_directories(3rd/eigen/include/eigen3)
 
+list(APPEND SRC_CPP
+        main.cpp  rasterizer.cpp Triangle.cpp
+        viewmodel.cpp Message.cpp view.cpp
+        )
+
 #conveniece to link shared libs
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 add_executable(Rasterizer
-        main.cpp  rasterizer.cpp Triangle.cpp viewmodel.cpp Message.cpp
+        ${SRC_CPP}
         )
 
 target_link_libraries(Rasterizer

@@ -7,7 +7,6 @@
 
 using namespace std;
 
-void waitKey();
 extern Message msg_ctrl;
 
 
@@ -40,14 +39,20 @@ void mouseCallback(int mouseEvent,int x,int y,int flags,void* param)
                 msg_ctrl.callFunc("eyeZMinus");
             msg_ctrl.callFunc("redraw");
     }
-    return;
 }
 
 
-void waitKey() {
+void viewLoop();
+void viewInitial() {
+    cv::namedWindow("image");
+    cv::setMouseCallback("image",mouseCallback);
+    viewLoop();
+}
+
+int waitKey() {
     int key=cv::waitKey(10);
-    if (key == -1) return;
-    if (key == 27) exit(0);
+    //提前结束
+    if (key == -1 || key == 27) return key;
 
     cout << "received " << static_cast<char>(key) << endl;
     string msg;
@@ -72,4 +77,18 @@ void waitKey() {
     if (msg != "skip"){
         msg_ctrl.callFunc(msg);
     }
+    return key;
+}
+
+void imshow() {
+    msg_ctrl.callFunc("needUpdate");
+    auto ptr=msg_ctrl.ptr;
+    cv::imshow ("image",*ptr);
+}
+
+void viewLoop() {
+    while (waitKey() != 27) {
+        imshow();
+    }
+    cv::destroyAllWindows();
 }

@@ -1,13 +1,12 @@
-﻿//
-// Created by user on 2021/7/15.
-//
-
+﻿
 #ifndef MAIN_CPP_MESSAGE_H
 #define MAIN_CPP_MESSAGE_H
 #include <functional>
-#include <cstdint>
+#include <vector>
 #include <map>
 #include <string>
+#include <cstdint>
+#include <opencv2/opencv.hpp>
 
 using namespace std;
 class Message {
@@ -15,12 +14,18 @@ class Message {
     typedef function<void(void)> ftype;
     vector<ftype> func_v;
     map<string,index> func_mp;
+    function<cv::Mat()> passf;
 public:
-
+    cv::Mat image,*ptr;
+    Message();
     void registerFunc(const string &s,ftype f);
-    void callFunc(const string &s); //TODO:是否需要参数，int还是void?
+    void callFunc(const string &s);
     void announceView();
-    void mainLoop();
+    void registerPassF(function<cv::Mat()> &&f);
+    void passImage() {
+        image=passf();
+        ptr=&image;
+    }
 };
 
 
