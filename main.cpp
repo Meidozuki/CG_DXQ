@@ -9,7 +9,7 @@
 #include "OBJ_Loader.h"
 
 #include "config.h"
-#include "viewmodel.hpp"
+#include "viewmodel.h"
 #include "Message.h"
 extern Message msg_ctrl;
 
