@@ -10,7 +10,8 @@
 
 #include "config.h"
 #include "viewmodel.hpp"
-extern ViewModel vm;
+#include "Message.h"
+extern Message msg_ctrl;
 
 #define Pool_size 4
 
@@ -429,8 +430,11 @@ int main(int argc, const char** argv)
     }
     
     
-    vm=ViewModel(r,eye_pos,TriangleList,filename,angle,45.0, 1, 0.1, 50);
-    vm.viewInit();
+    ViewModel vm=ViewModel(r,eye_pos,TriangleList,filename,angle,45.0, 1, 0.1, 50);
+    msg_ctrl.registerFunc("prepareVM",[&vm](){vm.vmInit();});
+
+    msg_ctrl.callFunc("prepareVM");
+    msg_ctrl.callFunc("announceView");//start loop
 
 //     while (key != 27)
 //     {
