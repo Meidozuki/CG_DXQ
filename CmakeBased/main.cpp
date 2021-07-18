@@ -2,9 +2,9 @@
 
 #include "viewmodel.h"
 #include "Message.h"
-extern Message msg_ctrl;
+Message msg_ctrl;
 
-int main(int argc, const char** argv)
+int main()
 {
     float angle = 140.0;
     std::string filename = "output.png";
@@ -14,7 +14,8 @@ int main(int argc, const char** argv)
     msg_ctrl.registerFunc("prepareVM",[&vm](){vm.vmInit();});
 
     msg_ctrl.callFunc("prepareVM");
-    msg_ctrl.callFunc("announceView");//start loop
+    msg_ctrl.callFunc("announceView");
+    msg_ctrl.callFunc("startLoop");
 
     return 0;
 }

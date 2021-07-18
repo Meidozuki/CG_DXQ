@@ -1,20 +1,17 @@
 #include <iostream>
-#include <cstdint>
 #include <memory>
 
 #include <opencv2/opencv.hpp>
 #include "Message.h"
+extern Message msg_ctrl;
 
 using namespace std;
 
-extern Message msg_ctrl;
-
-
 using cv::Point;
-static Point pt1,pt2;
 void mouseCallback(int mouseEvent,int x,int y,int flags,void* param)
 {
     static bool is_selecting=false;
+    static Point pt1,pt2;
     switch(mouseEvent)
     {
         case cv::EVENT_LBUTTONDOWN:
@@ -41,12 +38,13 @@ void mouseCallback(int mouseEvent,int x,int y,int flags,void* param)
     }
 }
 
-
 void viewLoop();
 void viewInitial() {
     cv::namedWindow("image");
     cv::setMouseCallback("image",mouseCallback);
-    viewLoop();
+    msg_ctrl.registerFunc("startLoop",
+                          [](){viewLoop();}
+    );
 }
 
 int waitKey() {
