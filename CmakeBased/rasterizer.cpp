@@ -170,7 +170,7 @@ static std::tuple<float, float, float> computeBarycentric2D(float x, float y, co
 }
 
 
-void rst::rasterizer::draw(std::vector<Triangle *> &TriangleList) {
+void rst::rasterizer::draw(std::vector<std::shared_ptr<Triangle>> &TriangleList) {
 
     float f1 = (50 - 0.1) / 2.0;
     float f2 = (50 + 0.1) / 2.0;

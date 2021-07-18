@@ -8,46 +8,36 @@
 #include <iostream>
 #include <Eigen/Core>
 #include <memory>
+#include <cstdint>
 #include "rasterizer.hpp"
-
-extern Eigen::Matrix4f get_view_matrix(Eigen::Vector3f eye_pos);
-extern Eigen::Matrix4f get_model_matrix(float angle);
-extern Eigen::Matrix4f get_projection_matrix(float eye_fov, float aspect_ratio, float zNear, float zFar);
+#include "config.h"
 
 using namespace std;
 
 class ViewModel {
-    rst::rasterizer *r;
-    Eigen::VectorXf eye_pos;
-    vector<Triangle*> *TriangleList;
-    vector<shared_ptr<Triangle>> refs;
+    rst::rasterizer r;
+    Eigen::Vector3f eye_pos;
+    vector<shared_ptr<Triangle>> TriangleList;
     float angle,eye_fov,aspect_ratio,zNear,zFar;
-    string filename;
-
+    string filename,cur_path;
+    typedef uint16_t range_t;
 public:
-    ViewModel(){
-        r=nullptr;
-        TriangleList=nullptr;
+    ViewModel():r(0,0){
         angle=eye_fov=aspect_ratio=zNear=zFar=0;
     }
 
-    ViewModel(rst::rasterizer &r,Eigen::Vector3f &eye_pos,vector<Triangle*> &TriangleList,
-              string &filename,float angle,float eye_fov,float aspect_ratio,
-              float zNear,float zFar) : angle(angle),eye_fov(eye_fov),
-              aspect_ratio(aspect_ratio),zNear(zNear),zFar(zFar),filename(filename) {
-        this->r=&r;
-        this->eye_pos=eye_pos;
-        this->TriangleList=&TriangleList;
-        int i=0;
-        for (auto tri : TriangleList) {
-            this->refs.emplace_back(tri);
-        }
+    ViewModel(range_t w,range_t h,Eigen::Vector3f &eye_pos,string &filename,
+              float angle,float eye_fov,float aspect_ratio,float zNear,float zFar) :
+              r(w,h),eye_pos(eye_pos),angle(angle),eye_fov(eye_fov),filename(filename),
+              cur_path(CUR_SRC_DIR),aspect_ratio(aspect_ratio),zNear(zNear),zFar(zFar) {
+        ;
     }
-    ~ViewModel() {refs.clear();}
+    ~ViewModel() {TriangleList.clear();}
 
 
     cv::Mat getImage(bool write=false);
 
+    void model_main();
     void vmInit();
     void redraw();
 
