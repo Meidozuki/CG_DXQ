@@ -1,26 +1,14 @@
 ﻿
-#include "viewmodel.hpp"
+#include "viewmodel.h"
+#include "Message.h"
 #include <ctime>
 
-ViewModel vm;
 extern Message msg_ctrl;
 
-void ViewModel::showImage(bool write=false) {
-    cv::Mat image(700, 700, CV_32FC3, r->frame_buffer().data());
-    image.convertTo(image, CV_8UC3, 1.0f);
-    cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
-
-    if (write) {
-        cv::imwrite(filename, image);
-    }
-    cv::imshow("image", image);
-}
-
-void ViewModel::viewInit() {
+void ViewModel::vmInit() {
     redraw();
-    showImage();
-    msg_ctrl.announceView();
 
+    msg_ctrl.registerPassF([this](){return this->getImage();});
     msg_ctrl.registerFunc("anglePlus",
                           [this](){this->modifyAngle(1);}
                           );
@@ -48,14 +36,18 @@ void ViewModel::viewInit() {
     msg_ctrl.registerFunc("redraw",
                           [this](){this->redraw();}
     );
-    msg_ctrl.registerFunc("imshow",
-                          [this](){this->showImage();}
-    );
 
-    msg_ctrl.mainLoop();
 };
 
-
+cv::Mat ViewModel::getImage(bool write) {
+    cv::Mat image(700, 700, CV_32FC3, r->frame_buffer().data());
+    image.convertTo(image, CV_8UC3, 1.0f);
+    cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
+    if (write) {
+        cv::imwrite(filename, image);
+    }
+    return image;
+}
 
 void ViewModel::redraw() {
     cout << "rendering" << endl;

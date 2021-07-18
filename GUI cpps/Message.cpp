@@ -1,26 +1,24 @@
-﻿//
-// Created by user on 2021/7/15.
-//
-
+﻿
 #include "Message.h"
-#include "view.cpp"
+extern void viewInitial();
 
 Message msg_ctrl;
 
-void viewReg(){
-    msg_ctrl.registerFunc("waitKey",waitKey);
-    cv::setMouseCallback("image",mouseCallback);
+Message::Message() {
+    ptr=nullptr;
+    passf=nullptr;
+    registerFunc("announceView",
+                 [this](){this->announceView();});
+    registerFunc("needUpdate",
+                 [this](){this->passImage();});
 }
 
 void Message::announceView() {
-    viewReg();
+    viewInitial();
 }
 
-void Message::mainLoop() {
-    while (true) {
-        callFunc("waitKey");
-        callFunc("imshow");
-    }
+void Message::registerPassF(function<cv::Mat()> &&f) {
+    passf=f;
 }
 
 void Message::registerFunc(const string &s,ftype f) {
