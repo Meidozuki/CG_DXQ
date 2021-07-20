@@ -11,24 +11,28 @@ using cv::Point;
 void mouseCallback(int mouseEvent,int x,int y,int flags,void* param)
 {
     static bool is_selecting=false;
-    static Point pt1,pt2;
+    static Point pt;
     switch(mouseEvent)
     {
         case cv::EVENT_LBUTTONDOWN:
-            pt1 = Point(x,y);
-            pt2 = Point(x,y);
+            pt = Point(x,y);
             is_selecting = true;
             break;
         case cv::EVENT_LBUTTONUP:
-            pt2 = Point(x,y);
+            pt = Point(x,y);
             is_selecting = false;
-            cout << x << ends << y << endl;
             break;
         case cv::EVENT_MOUSEMOVE:
-            if(is_selecting)
-                pt2 = Point(x,y);
+            if(is_selecting){
+                if (pt.x < x)
+                    msg_ctrl.callFunc("anglePlus");
+                if (pt.x > x)
+                    msg_ctrl.callFunc("angleMinus");
+                msg_ctrl.callFunc("redraw");
+                pt = Point(x,y);
+            }
             break;
-        case cv::EVENT_MOUSEHWHEEL:
+        case cv::EVENT_MOUSEHWHEEL://没用
             int v=cv::getMouseWheelDelta(flags);
             if (v > 0)
                 msg_ctrl.callFunc("eyeZPlus");
@@ -75,6 +79,7 @@ int waitKey() {
     if (msg != "skip"){
         msg_ctrl.callFunc(msg);
     }
+    msg_ctrl.callFunc("redraw");
     return key;
 }
 
