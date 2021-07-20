@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
-project(Rasterizer)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS -O1)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 
 include_directories(include)
 
@@ -16,16 +15,26 @@ include_directories(3rd/opencv/include)
 #        PATHS 3rd/eigen/share)
 include_directories(3rd/eigen/include/eigen3)
 
+
 list(APPEND SRC_CPP
         main.cpp  rasterizer.cpp Triangle.cpp
         viewmodel.cpp Message.cpp view.cpp
         )
 
 #conveniece to link shared libs
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
+project(Rasterizer)
 add_executable(Rasterizer
         ${SRC_CPP}
         )
+
+if(WIN32)
+    set(STRING_CXX_FLAGS "-D_UNICODE")
+    foreach(src ${SRC_CPP})
+        set_source_files_properties(${src} PROPERTIES
+                COMPILE_FLAGS "${STRING_CXX_FLAGS}"
+                )
+    endforeach()
+endif(WIN32)
 
 target_link_libraries(Rasterizer
         ${OpenCV_LIBS}
