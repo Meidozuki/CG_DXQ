@@ -34,7 +34,6 @@ public:
     }
     ~ViewModel() {TriangleList.clear();}
 
-
     cv::Mat getImage(bool write=false);
 
     void model_main();

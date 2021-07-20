@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include "rasterizer.hpp"
-#include <math.h>
+#include <cmath>
 
 
 rst::pos_buf_id rst::rasterizer::load_positions(const std::vector<Eigen::Vector3f> &positions)

@@ -131,7 +131,7 @@ void ViewModel::model_main() {
     r.set_vertex_shader(vertex_shader);
     r.set_fragment_shader(active_shader);
 
-    int frame_count = 0;
+//    int frame_count = 0;
 
     if (command_line)
     {

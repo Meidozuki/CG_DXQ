@@ -2,15 +2,15 @@
 #include "Message.h"
 extern void viewInitial();
 
-Message msg_ctrl;
-
 Message::Message() {
     ptr=nullptr;
     passf=nullptr;
     registerFunc("announceView",
-                 [this](){this->announceView();});
+                 [this](){this->announceView();}
+                 );
     registerFunc("needUpdate",
-                 [this](){this->passImage();});
+                 [this](){this->passImage();}
+                 );
 }
 
 void Message::announceView() {
