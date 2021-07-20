@@ -24,10 +24,10 @@ void ViewModel::vmInit() {
                           [this](){this->modifyEyepos(-0.1,0);}
     );
     msg_ctrl.registerFunc("eyeUp",
-                          [this](){this->modifyEyepos(0.1,1);}
+                          [this](){this->modifyEyepos(-0.1,1);}
     );
     msg_ctrl.registerFunc("eyeDown",
-                          [this](){this->modifyEyepos(-0.1,1);}
+                          [this](){this->modifyEyepos(0.1,1);}
     );
     msg_ctrl.registerFunc("eyeZPlus",
                           [this](){this->modifyEyepos(0.2,2);}
