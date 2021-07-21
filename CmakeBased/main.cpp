@@ -4,8 +4,10 @@
 #include "Message.h"
 Message msg_ctrl;
 
+
 int main()
 {
+
     float angle = 140.0;
     std::string filename = "output.png";
     Eigen::Vector3f eye_pos = { 0,0,10 };

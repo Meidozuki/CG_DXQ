@@ -3,6 +3,11 @@
 #include "Message.h"
 #include "model.cpp"
 #include <ctime>
+#include "pro_function.hpp"
+#include "ThreadPool.hpp"
+
+#define Pool_size 4
+
 
 extern Message msg_ctrl;
 
@@ -65,6 +70,7 @@ void ViewModel::redraw() {
 
 void ViewModel::model_main() {
 
+    Thread::ThreadPool *pools = new Thread::ThreadPool(Pool_size);   //线程池
     bool command_line = false;
 
     std::string obj_path = cur_path + "/models/spot/";

@@ -15,18 +15,17 @@ include_directories(3rd/opencv/include)
 #        PATHS 3rd/eigen/share)
 include_directories(3rd/eigen/include/eigen3)
 
-
 list(APPEND SRC_CPP
-        main.cpp  rasterizer.cpp Triangle.cpp
+        main.cpp  rasterizer.cpp Triangle.cpp ThreadPool.cpp
         viewmodel.cpp Message.cpp view.cpp
         )
 
-#conveniece to link shared libs
 project(Rasterizer)
 add_executable(Rasterizer
         ${SRC_CPP}
         )
 
+#Unicode
 if(WIN32)
     set(STRING_CXX_FLAGS "-D_UNICODE")
     foreach(src ${SRC_CPP})
@@ -43,3 +42,5 @@ target_link_libraries(Rasterizer
 #specify CUR_SRC_DIR
 configure_file(config.h.in config.h)
 target_include_directories(Rasterizer PUBLIC "${PROJECT_BINARY_DIR}")
+
+include(CPack)
